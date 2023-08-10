@@ -1,4 +1,8 @@
 const TelegramBot = require("node-telegram-bot-api");
+const {
+  gameOptions,
+  agameOptions
+} = require("./options")
 const token = "5523403818:AAEoWPnWkxHn9FX0kbZAuL7AscjFR4z701c";
 
 const bot = new TelegramBot(token, {
@@ -6,54 +10,15 @@ const bot = new TelegramBot(token, {
 });
 
 const obj = {};
-const gameOptions = {
-  reply_markup: {
-    inline_keyboard: [
-      [{
-          text: "1",
-          callback_data: "1",
-        },
-        {
-          text: "2",
-          callback_data: "2",
-        },
-        {
-          text: "3",
-          callback_data: "3",
-        },
-      ],
-      [{
-          text: "4",
-          callback_data: "4",
-        },
-        {
-          text: "5",
-          callback_data: "5",
-        },
-        {
-          text: "6",
-          callback_data: "6",
-        },
-      ],
-      [{
-          text: "7",
-          callback_data: "7",
-        },
-        {
-          text: "8",
-          callback_data: "8",
-        },
-        {
-          text: "9",
-          callback_data: "9",
-        },
-      ],
-      [{
-        text: "0",
-        callback_data: "0",
-      }, ],
-    ],
-  },
+
+const startGame = async chatId => {
+  await bot.sendMessage(
+    chatId,
+    "Kompyuter 0 dan 9 gacha son o'ylaydi va Siz kompyuter o'ylagan sonni topasiz...):"
+  );
+  const randomNumber = Math.floor(Math.random() * 10);
+  obj[chatId] = randomNumber;
+  await bot.sendMessage(chatId, "To'gri sonni toping.", gameOptions);
 };
 
 const botstrapBot = () => {
@@ -72,7 +37,6 @@ const botstrapBot = () => {
   ]);
 
   bot.on("message", async (msg) => {
-    console.log(msg);
     const text = msg.text;
     const chatId = msg.chat.id;
 
@@ -103,15 +67,30 @@ const botstrapBot = () => {
     }
 
     if (text === "/game") {
+      return startGame(chatId);
+    }
+  });
+
+  bot.on("callback_query", async (msg) => {
+    const data = msg.data;
+    const chatId = msg.message.chat.id;
+
+    if (data === "again") {
+      await startGame(chatId)
+    }
+
+    if (data == obj[chatId]) {
       await bot.sendMessage(
         chatId,
-        "Kompyuter 0 dan 9 gacha son o'ylaydi va Siz kompyuter o'ylagan sonni topasiz...):"
+        `Tabriklaymiz siz to'g'ri topdingiz, Kompyuter ${obj[chatId]} sonni tanlagan edi`
       );
-      const randomNumber = Math.floor(Math.random() * 10);
-      obj[chatId] = randomNumber;
-      return bot.sendMessage(chatId, "To'gri sonni toping.", gameOptions);
+    } else {
+      await bot.sendMessage(
+        chatId,
+        `Siz noto'g'ri son tanladingiz tanlagan sonningiz ${data}, Kompyuter ${obj[chatId]} sonni tanlagan edi`,
+        agameOptions
+      );
     }
-    // bot.sendMessage(chatId, "Uzur sizni gapingizga tushunmadim!! ):");
   });
 };
 
