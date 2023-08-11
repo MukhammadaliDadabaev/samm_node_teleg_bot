@@ -75,7 +75,7 @@ const botstrapBot = () => {
     const data = msg.data;
     const chatId = msg.message.chat.id;
 
-    if (data === "again") {
+    if (data === "/again") {
       await startGame(chatId)
     }
 

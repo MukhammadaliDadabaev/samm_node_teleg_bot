@@ -54,7 +54,7 @@ module.exports = {
       inline_keyboard: [
         [{
           text: "Qayta boshlash",
-          callback_data: "again",
+          callback_data: "/again",
         }, ],
       ],
     },
